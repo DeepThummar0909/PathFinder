@@ -11,9 +11,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JComponent;
 
@@ -21,7 +21,7 @@ import core.Grid;
 import core.Model;
 import core.Node;
 
-public class View extends JComponent implements Observer {
+public class View extends JComponent implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 8596333059804667076L;
 	
@@ -52,7 +52,7 @@ public class View extends JComponent implements Observer {
 		setVisible(false);
 		
 		this.model = model;		
-		model.addObserver(this);
+		model.addPropertyChangeListener(this);
 		
 		// resizing
 		addComponentListener(new ComponentAdapter() {
@@ -202,11 +202,11 @@ public class View extends JComponent implements Observer {
 		g.fillRect(x * PIXEL_WIDTH, y * PIXEL_WIDTH, PIXEL_WIDTH, PIXEL_WIDTH);
 	}
 	
-	// ==== Observer Implementation ====
+	// ==== PropertyChangeListener Implementation ====
 
 	@Override
-	public void update(Observable o, Object arg) {		
-		if (o == model) {
+	public void propertyChange(PropertyChangeEvent evt) {		
+		if (evt.getSource() == model) {
 			repaint();
 		}		
 	}

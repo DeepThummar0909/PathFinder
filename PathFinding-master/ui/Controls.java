@@ -7,8 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Observable;
-import java.util.Observer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -29,7 +29,7 @@ import javax.swing.event.ChangeListener;
 import algorithms.Search;
 import core.Model;
 
-public class Controls extends Box implements Observer, ActionListener, ChangeListener {
+public class Controls extends Box implements PropertyChangeListener, ActionListener, ChangeListener {
 	
 	private static final long serialVersionUID = 4393439353746474082L;
 	
@@ -59,7 +59,7 @@ public class Controls extends Box implements Observer, ActionListener, ChangeLis
             new EmptyBorder(20, 20, 20, 20)));
         
 		this.model = model;
-		model.addObserver(this);
+		model.addPropertyChangeListener(this);
 		
 		delaySlider.setMinorTickSpacing(1);
 		delaySlider.setMajorTickSpacing(5);
@@ -146,11 +146,11 @@ public class Controls extends Box implements Observer, ActionListener, ChangeLis
         return textArea;
     }
 
-	// ==== Observer Implementaiton ====
+	// ==== PropertyChangeListener Implementation ====
 	
 	@Override
-	public void update(Observable o, Object arg) {
-		if (o == model) {
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getSource() == model) {
 			algorithmComboBox.setSelectedIndex(model.getSearchAlgorithm());
 			diagonalComboBox.setSelectedIndex(model.getDiagonalMovement());
 			heuristicComboBox.setSelectedIndex(model.getSearchHeuristic());

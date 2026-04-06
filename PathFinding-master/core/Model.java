@@ -4,11 +4,12 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiFunction;
@@ -23,7 +24,7 @@ import algorithms.DepthFirst;
 import algorithms.Dijkstra;
 import algorithms.Search;
 
-public class Model extends Observable implements ActionListener {
+public class Model implements ActionListener {
 	
 	// ==== Properties ====
 	
@@ -47,6 +48,8 @@ public class Model extends Observable implements ActionListener {
 	
 	public Grid grid;
 	
+	private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+	
 	// ==== Constructor ====
 	
 	public Model() {
@@ -55,6 +58,22 @@ public class Model extends Observable implements ActionListener {
 		setActive(false);
 		setSize(new Dimension(1, 1));
 		setActive(true);
+	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeSupport.addPropertyChangeListener(listener);
+	}
+	
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeSupport.removePropertyChangeListener(listener);
+	}
+	
+	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+	}
+	
+	protected void firePropertyChange(String propertyName) {
+		propertyChangeSupport.firePropertyChange(propertyName, null, null);
 	}
 	
 	
@@ -84,8 +103,7 @@ public class Model extends Observable implements ActionListener {
 				fit();
 			}
 			
-			setChanged();
-			notifyObservers();
+			firePropertyChange("modelChanged");
 		}
 	}
 	
@@ -98,8 +116,7 @@ public class Model extends Observable implements ActionListener {
 		start.setLocation(midX - 5, midY);
 		goal.setLocation(midX + 5, midY);
 				
-		setChanged();
-		notifyObservers();
+		firePropertyChange("modelChanged");
 	}
 	
 	public synchronized final int getDiagonalMovement() {
@@ -197,8 +214,7 @@ public class Model extends Observable implements ActionListener {
 		walls.clear();	
 		grid = new Grid(dimension, walls);
 		
-		setChanged();
-		notifyObservers();
+		firePropertyChange("modelChanged");
 	}
 	
 	public synchronized final void startSearch() {
@@ -308,8 +324,7 @@ public class Model extends Observable implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {		
 		if (e.getSource() == timer) {
-			setChanged();
-			notifyObservers();
+			firePropertyChange("modelChanged");
 			
 			if (thread != null && thread.isAlive())
 				return;
